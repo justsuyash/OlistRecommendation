@@ -1,5 +1,8 @@
 <H1>Recommendations to OLIST </H1>
 <br>
+<p>
+    <img src="OLIST Final Dashboard Screenshots/Picture1.png" />
+</p>
 <H3> Review </H3>
 <ul>
 <li>Overall reviews average for all products is 4.0 (Based on 118,315 review counts)
@@ -24,6 +27,9 @@
 </ul>
 <br>
 <br>
+<p>
+    <img src="OLIST Final Dashboard Screenshots/Picture2.png" />
+</p>
 <H3>Payment Type</H3>
 <ul>
 <li>We have 4 payment types. From 2016 to 2018 the total payment received (freight + sales) is 20.4 million.
@@ -38,7 +44,9 @@ https://medium.com/@deelipku23/review-prediction-brazilian-e-commerce-dataset-7f
 https://olist.com/branded-store/
 https://labsnews.com/en/articles/business/olist-raises-brl-310-million-round-from-softbank-and-announces-clickspace-acquisition/
 https://pitchbook.com/profiles/company/102473-65#competitors
-
+<p>
+    <img src="OLIST Final Dashboard Screenshots/0003.jpg" />
+</p>
 <H3>Sellers:</H3> 
 <ul>
 Areas with less sellers (remote), low performing seller is mainly a geographical issue: 
@@ -55,6 +63,12 @@ Recommendation = in remote areas, focus on items not available in local stores.
 </ul> 
 <br>
 <br>
+<p>
+    <img src="OLIST Final Dashboard Screenshots/0004.jpg" />
+</p>
+<p>
+    <img src="OLIST Final Dashboard Screenshots/Picture3.png" />
+</p>
 <H3>Freight ratios:</H3>
 Top 10 highest freight ratios sellers are actually located in “good areas”
 <h5>Recommendation on freight ratios :</h5> 
