@@ -1,3 +1,10 @@
+<H1>OLIST E-Commerce Kaggle - 1st Prize</H1><p>
+    <img src="OLIST Final Dashboard Screenshots/—Pngtree—hand drawn illustration racing car_3932257.png" width="220" height="240" />
+</p>
+<h2> Description</h2>
+<h3>
+<p>I wa given OLIST e-commerce data From Kaggle, its a brazillian marketplace like amazon and I had to suggests recommendations based on it to improve business, the data set has 1.4 Million rows and about 500 Columns. I used python to clean, examine, and model data and also had to do a lot of feature engineering for the same finally I did statisticaL tests and later built dashboards to show my findings. This presentation was placed first and following are my recommendations </p>
+<h3>
 <H1>Recommendations to OLIST </H1>
 <br>
 <p>
