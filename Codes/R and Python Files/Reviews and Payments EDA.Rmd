@@ -1,0 +1,260 @@
+---
+title: "Review, and Payment Type"
+author: "Team 1"
+date: "11/25/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Questions answering 
+
+```{r pacman, warning=FALSE, message=FALSE, echo = FALSE}
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load(reshape2, data.table, ggplot2, readr, dplyr, mosaic, tidyverse, multcomp, reshape, scales, TinyTeX)
+olist<-as.data.frame( read_csv("olist_final_final.csv"))
+olist <- olist %>% mutate(item_sub= order_item_id * price)
+olist$item_sub <- as.numeric(olist$item_sub)
+
+```
+
+#Q1. What is the highest review score? The lowest? The most common? (code for Python)
+```{r}
+olist_final = pd.read_csv("olist_final_final.csv")
+
+#Q1. What is the highest review score? The lowest? The most common?
+# Numbers of reviews and review score
+sns.catplot(
+x ='review_score',
+kind='count',
+data= olist_final,
+).set(
+xlabel= 'Review Score',
+ylabel= 'Number of Reviews')
+
+olist_final.groupby('review_score')['review_score'].count()
+
+olist_final.review_score.plot(kind='density',subplots=True)
+# review score box plot, do not drop any outliers since review may be as low as 1.0.
+plt.boxplot(olist_final.review_score)
+olist_final.review_score.describe()
+
+```
+
+##Q2. What categories have the most order (based on product_id)? 
+housewares	          7380		
+computers_accessories	8151		
+furniture_decor       8833		
+sports_leisure        9005		
+health_beauty         10030		
+bed_bath_table        11990
+
+As shown, bed bath table is the most order product category.
+
+
+```{r}
+#products categories based on product_ids 
+
+try_1 <- olist %>% 
+  group_by(product_category_name_english)%>%
+  summarise(result=(product_id))
+
+#Most selling categories top 20
+x=as.data.frame(count(try_1))
+x_1 <- x[order(x$n),][71:52,]
+
+#Bar chart most selling categories top 20
+ggplot(x_1, aes (x=product_category_name_english, y=n))+
+  geom_bar(stat= "identity", width=0.5 , fill="tomato2")+
+  labs(x= "categories", y="counts", titles =paste ("Categories vs count"))+theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+
+```
+
+
+
+##Q3. What categories have the highest sum reviews?
+These are the top 10 categories of the highest sum review scores:
+
+bed_bath_table	        46366			
+health_beauty	          41315			
+sports_leisure	        36856			
+furniture_decor	        34407			
+computers_accessories   32002			
+housewares	            29854			
+watches_gifts           24856			
+telephony               18612			
+garden_tools            18412			
+auto                    17770
+
+```{r}
+try_2 <- olist %>% 
+  group_by(product_category_name_english)%>%
+  summarise(result=sum(review_score))
+x_3 <- try_2[order(try_2$result),][71:52,]
+x_3
+
+ggplot(x_3, aes(x=product_category_name_english, y=result)) + 
+  geom_point(size=3) + 
+  geom_segment(aes(x=product_category_name_english, 
+                   xend=product_category_name_english, 
+                   y=0, 
+                   yend=result)) + 
+  labs(title="Lollipop Chart", 
+       subtitle="Sum Score vs. product category ", 
+       caption="source: review_order") + 
+  theme(axis.text.x = element_text(angle=90, vjust=0.6))
+
+```
+
+##Q4. Who are the most reviewed sellers (based on review counts)?
+
+Most reviewed sellers' ID and number counts:
+
+4a3ca9315b744ce9f8e9374361493884	335			
+7c67e1448b00f6e969d365cea6b010ab	333			
+1f50f920176fa81dab994f9023523100	296			
+6560211a19b47992c3666cc44a7e94c0	287			
+1025f0e2d44d7041d6cf58b6550e0bfa	240			
+cc419e0650a3c5ba77189a1882b7556a	236			
+da8622b14eb17ae2831f4ac5b9dab84a	186			
+955fee9216a65b617aa5c0531780ce60	160	
+ea8482cd71df3c1969d7b9473ff13abc	158			
+cca3071e3e9bb7d12640c9fbe2301306	139	
+
+```{r}
+try_55 <- olist %>% 
+  group_by(seller_id)%>%
+  summarise(result=count(review_score))
+x_4 <- try_55[order(try_55$result),][3033:3014,]
+x_4
+```
+
+##Q5. What is the relationship between payment value and installments? 
+There is a positive 0.27 correlation between payment value and payment installments, a weak relationship between payment value and payment installments. 
+```{r}
+# payment installments and payment value correlation
+olist <- olist %>% mutate(item_sub= order_item_id * price)
+olist$item_sub <- as.numeric(olist$item_sub)
+cor.mat <- round(cor(olist[c("payment_installments","item_sub")]),2)  
+
+melted.cor.mat <- melt(cor.mat) 
+ggplot(melted.cor.mat, aes(x = X1, y = X2, fill = value)) + 
+  scale_fill_gradient(low="wheat", high="orangered") +
+  geom_tile() + 
+  geom_text(aes(x = X1, y = X2, label = value)) +
+  ggtitle("Are payment types and item sub correlated?")
+
+```
+
+##Q6. Correlations between Payment types and other variables.
+We used a correlation heatmap to plot out the srongest positive and negative correlations. As indicated, "price" and "payment value" have the strongest correlation, with a positive 0.89. "review_item_id" and "review_score" have the lowest correlation, with a negative 0.13.
+```{r}
+#average payment with installment and without installment
+olist_x<- olist[,c(12,15,16,17,18,19,20,22,35)]
+
+#olist_x$review_score <- factor(olist_x$review_score)
+#olist_x$payment_type <- factor(olist_x$payment_type)
+str(olist_x)
+olist_x[olist_x$payment_type  == 'boleto', 'payment_type_factor']<-0
+olist_x[olist_x$payment_type  == 'credit_card', 'payment_type_factor']<-1
+olist_x[olist_x$payment_type  == 'debit_card', 'payment_type_factor']<-2
+olist_x[olist_x$payment_type  == 'voucher', 'payment_type_factor']<-3
+olist$payment_type_factor <- factor(olist_x$payment_type_factor)
+
+cor.mat_1 <- round(cor(olist_x[,-c(5)]), 2)
+
+melted.cor.mat_1 <- melt(cor.mat_1, varnames = c("Var1", "Var2"))
+
+ggplot(melted.cor.mat_1, aes(x = Var1, y = Var2, fill = value)) +
+  scale_fill_gradient(low="wheat", high="orangered") +
+  geom_tile() + 
+  geom_text(aes(x = Var1, y = Var2, label = value)) +
+  ggtitle("Which Variables Are Highly Correlated?") + xlab("Variable 1") + ylab("Variable 2")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.6))
+  
+```
+
+#Q7. What is the main payment type? Do customers who use a certain payment spend more than other customers?
+Credit card is the main payment type with a total of $15,481,976.1 from 2016 to 2018
+Boleto is the second most used payment type with a total of	$4,024,296.2			
+Voucher	is the third most used payment type with a total of $401,700.6	
+Debit_card is the least used payment type with a total of $250,077.9			
+
+Payment type and average payment value:
+
+boleto            177.34427			
+credit_card       179.99786			
+debit_card        150.10676			
+voucher           64.67567	
+```{r}
+# payment methods distributions and outliers
+ggplot(olist) +
+  geom_boxplot(aes(x = payment_type, y = payment_value), 
+               fill = "gold1", outlier.color = "firebrick2") + 
+  coord_flip() + 
+  xlab("payment types") + ggtitle("Where are the Outliers?")
+
+amount <-as.data.frame(olist %>% 
+  group_by(payment_type)%>%
+  summarise(result=sum(payment_value)))
+amount
+
+amount_mean <-as.data.frame(olist %>% 
+  group_by(payment_type)%>%
+  summarise(result=mean(payment_value)))
+colnames(amount_mean)[2] = "average amount"
+amount_mean
+
+# Draw plot
+theme_set(theme_bw())
+ggplot(olist, aes(x=payment_type, y=payment_value)) + 
+  geom_bar(stat="identity", width=.5, fill="orangered") + 
+  labs(title="Bar Chart", 
+       subtitle="Payment types and values", 
+       caption="source: payment") + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6))
+
+```
+
+##Q8.Is there evidence that people are spending more when paying with credit card?
+Since the contribution of item sub from 4 payment types are right skewed and with several outliers, we decided to log item sub for further evaluation.
+From the ANOVA test, reject the null, there are statistically significance between variables. We went further for the Dunnet to see which payment type is different from the reference group. Result came out with Voucher is statistically significantly different from the reference group Boleto and credit card is also statistically significantly differernt form the reference group Boleto.
+```{r}
+favstats( item_sub~payment_type, data=olist)
+bwplot(item_sub~payment_type, data=olist)
+densityplot(~item_sub, groups=payment_type, auto.key = TRUE, data=olist)
+
+#log
+olist_2= transform(olist, logitemsub= log(item_sub))
+favstats(logitemsub~payment_type, data=olist_2)
+bwplot(logitemsub~payment_type, data=olist_2)
+densityplot(~logitemsub, groups = payment_type, auto.key = TRUE, data=olist_2)
+
+#Significance
+ov1 <- anova(lm(logitemsub~payment_type, data= olist_2))
+ov1 #Reject null, at least one mean is different from others.
+summary(lm(logitemsub~payment_type, data= olist_2))
+
+#Dunnet prodcedure 
+olist_2$payment_type <- factor(olist_2$payment_type)
+fit <- aov(logitemsub~payment_type, olist_2)
+set.seed(42)
+Dunnet <- glht(fit,linfct=mcp(payment_type="Dunnett"))
+summary(Dunnet)
+
+#Credit card, and Voucher are significantly different from rest of the payment types.
+```
+
+
+
+
+
+
+
+
+
+
